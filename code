@@ -1,0 +1,56 @@
+import streamlit as st
+
+st.set_page_config(page_title="Cozy Routine Planner", page_icon="🍂")
+
+st.title("🍂 Daily Routine Planner")
+
+st.write("Welcome! Build your perfect balanced day ☕")
+
+w = st.number_input("Wake-up time (0-23)", 0, 23, 7)
+b = st.number_input("Sleep time (0-23)", 0, 23, 23)
+
+num = st.number_input("Number of activities", 1, 10, 2)
+
+activities = {}
+
+for i in range(int(num)):
+    st.subheader(f"Activity {i+1}")
+
+    task = st.text_input(f"Task name {i}", key=f"t{i}")
+    duration = st.number_input(f"Duration {i}", key=f"d{i}", min_value=1)
+    priority = st.number_input(f"Priority {i}", key=f"p{i}", min_value=1)
+
+    if task:
+        activities[task] = {
+            "duration": duration,
+            "priority": priority
+        }
+
+rest = st.selectbox("Rest after lunch?", ["False", "True"])
+rest_time = st.number_input("Rest duration", 0)
+
+if st.button("Generate Routine 🍁"):
+
+    if b < w:
+        available_time = (24 - w) + b
+    else:
+        available_time = b - w
+
+    if rest == "True":
+        available_time -= rest_time
+
+    tasks = list(activities.items())
+    tasks.sort(key=lambda x: x[1]["priority"])
+
+    routine = []
+    remain = available_time
+
+    for task, info in tasks:
+        if info["duration"] <= remain:
+            routine.append(task)
+            remain -= info["duration"]
+
+    st.subheader("Your Cozy Schedule 🍂")
+
+    for i, task in enumerate(routine, 1):
+        st.write(f"{i}. {task}")
